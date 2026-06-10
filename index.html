@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to the Edge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E0D1A;
+    --ink-2:#14132B;
+    --navy:#27265F;
+    --red:#BF1717;
+    --amber:#F7B41B;
+    --sky:#84D3F1;
+    --paper:#F4F4F6;
+    --mute:#8A89A0;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  html,body{height:100%;}
+
+  body{
+    background:radial-gradient(120% 120% at 50% 30%, var(--ink-2) 0%, var(--ink) 60%, #07060F 100%);
+    color:var(--paper);
+    font-family:'Inter',system-ui,sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* faint drifting grain so the dark never feels flat */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:3px 3px;
+    opacity:.5;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .stage{
+    position:relative;
+    height:100dvh;
+    width:100%;
+    z-index:1;
+  }
+
+  .screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:32px 24px;
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(14px);
+    transition:opacity .9s ease, transform .9s ease, visibility .9s;
+  }
+  .screen.active{
+    opacity:1;
+    visibility:visible;
+    transform:none;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:680px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+  }
+
+  /* ---- the edge line: the signature element ---- */
+  .edge-line{
+    position:relative;
+    width:min(78vw,520px);
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--red) 50%, transparent);
+    box-shadow:0 0 18px 1px rgba(191,23,23,.55), 0 0 60px 4px rgba(191,23,23,.25);
+    transform:scaleX(0);
+    transform-origin:center;
+    transition:transform 1.4s cubic-bezier(.16,.84,.3,1);
+  }
+  .screen.active .edge-line{transform:scaleX(1);}
+
+  .edge-line.thin{
+    height:1px;
+    opacity:.6;
+    box-shadow:0 0 10px rgba(191,23,23,.4);
+  }
+
+  /* ---- type ---- */
+  .kicker{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:.72rem;
+    letter-spacing:.34em;
+    text-transform:uppercase;
+    color:var(--mute);
+  }
+
+  .display{
+    font-family:'Bebas Neue',sans-serif;
+    line-height:.96;
+    letter-spacing:.01em;
+    font-size:clamp(2.9rem,11vw,6.4rem);
+    text-transform:uppercase;
+  }
+  .display .lit{color:var(--red);}
+  .display .sky{color:var(--sky);}
+
+  .lede{
+    font-family:'Inter',sans-serif;
+    font-weight:400;
+    font-size:clamp(1.02rem,3.4vw,1.32rem);
+    line-height:1.55;
+    color:#D7D6E2;
+    max-width:30ch;
+  }
+
+  .small{
+    font-size:.92rem;
+    color:var(--mute);
+    line-height:1.5;
+  }
+
+  /* typewriter caret */
+  .type-line{
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    color:var(--paper);
+    min-height:1.6em;
+  }
+  .caret{
+    display:inline-block;
+    width:.6ch;
+    color:var(--red);
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  /* ---- buttons ---- */
+  .btn{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:.12em;
+    font-size:1.45rem;
+    text-transform:uppercase;
+    color:var(--paper);
+    background:transparent;
+    border:1.5px solid rgba(244,244,246,.35);
+    padding:13px 38px;
+    border-radius:2px;
+    cursor:pointer;
+    transition:border-color .35s, color .35s, box-shadow .35s, transform .2s;
+    position:relative;
+  }
+  .btn:hover,.btn:focus-visible{
+    border-color:var(--red);
+    color:#fff;
+    box-shadow:0 0 22px rgba(191,23,23,.45);
+    outline:none;
+  }
+  .btn:active{transform:translateY(1px);}
+
+  .btn.pulse{animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(191,23,23,.0);border-color:rgba(244,244,246,.35);}
+    50%{box-shadow:0 0 30px 2px rgba(191,23,23,.5);border-color:rgba(191,23,23,.85);}
+  }
+
+  .btn-primary{
+    border-color:var(--red);
+    background:var(--red);
+    color:#fff;
+  }
+  .btn-primary:hover,.btn-primary:focus-visible{
+    background:#d81c1c;
+    box-shadow:0 0 30px rgba(191,23,23,.6);
+  }
+
+  .ghost-link{
+    background:none;border:none;color:var(--mute);
+    font-family:'Inter',sans-serif;font-size:.85rem;
+    text-decoration:underline;text-underline-offset:3px;
+    cursor:pointer;letter-spacing:.02em;
+  }
+  .ghost-link:hover{color:var(--paper);}
+
+  /* ---- glimpse fragments ---- */
+  .glimpse{
+    font-family:'Syne',sans-serif;
+    font-weight:800;
+    font-size:clamp(1.5rem,6vw,2.6rem);
+    line-height:1.15;
+    max-width:18ch;
+    min-height:3.2em;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .glimpse span{
+    opacity:0;
+    transition:opacity .6s ease;
+  }
+  .glimpse span.show{opacity:1;}
+
+  .dots{display:flex;gap:9px;margin-top:4px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(244,244,246,.22);transition:background .4s, transform .4s;}
+  .dot.on{background:var(--red);transform:scale(1.25);}
+
+  /* ---- grade picker ---- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    width:100%;
+    max-width:520px;
+  }
+  .grade{
+    border:1.5px solid rgba(244,244,246,.22);
+    background:rgba(255,255,255,.02);
+    border-radius:4px;
+    padding:16px 6px 13px;
+    cursor:pointer;
+    transition:border-color .3s, background .3s, transform .2s;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+  }
+  .grade:hover,.grade:focus-visible{
+    border-color:var(--red);
+    background:rgba(191,23,23,.08);
+    outline:none;
+  }
+  .grade.sel{
+    border-color:var(--red);
+    background:rgba(191,23,23,.14);
+    box-shadow:0 0 18px rgba(191,23,23,.3);
+  }
+  .grade .g{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:.9;}
+  .grade .word{font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
+  .grade.sel .word{color:var(--paper);}
+
+  .field{
+    width:100%;max-width:340px;
+    background:transparent;
+    border:none;border-bottom:1.5px solid rgba(244,244,246,.3);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;font-size:1.05rem;
+    text-align:center;
+    padding:11px 4px;
+    letter-spacing:.02em;
+  }
+  .field::placeholder{color:var(--mute);}
+  .field:focus{outline:none;border-bottom-color:var(--red);}
+
+  /* ---- unlock split ---- */
+  .split-wrap{
+    position:relative;
+    width:min(82vw,560px);
+    height:60px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .split-half{
+    position:absolute;top:50%;
+    width:50%;height:2px;
+    background:linear-gradient(90deg, transparent, var(--red));
+    box-shadow:0 0 18px rgba(191,23,23,.5);
+    transition:transform 1.3s cubic-bezier(.16,.84,.3,1);
+  }
+  .split-half.l{left:0;transform-origin:left;}
+  .split-half.r{right:0;background:linear-gradient(90deg, var(--red), transparent);transform-origin:right;}
+  .screen.active .split-half.l{transform:translateY(-22px) rotate(-1deg);}
+  .screen.active .split-half.r{transform:translateY(22px) rotate(1deg);}
+
+  .delay-1{transition-delay:.5s;}
+  .delay-2{transition-delay:1.0s;}
+  .delay-3{transition-delay:1.6s;}
+  .delay-4{transition-delay:2.2s;}
+
+  .fade-up{opacity:0;transform:translateY(10px);transition:opacity .8s ease, transform .8s ease;}
+  .screen.active .fade-up{opacity:1;transform:none;}
+
+  /* progress whisper */
+  .whisper{
+    position:fixed;bottom:18px;left:0;right:0;
+    text-align:center;
+    font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;
+    color:rgba(138,137,160,.55);
+    z-index:2;
+    pointer-events:none;
+  }
+
+  .footer-mark{
+    position:fixed;top:18px;left:0;right:0;
+    text-align:center;
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:.32em;font-size:.8rem;
+    color:rgba(138,137,160,.5);
+    z-index:2;pointer-events:none;
+  }
+
+  @media (max-width:420px){
+    .grid{grid-template-columns:repeat(5,1fr);gap:6px;}
+    .grade{padding:12px 2px 10px;}
+    .grade .g{font-size:1.5rem;}
+    .grade .word{font-size:.5rem;letter-spacing:.08em;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:opacity .3s ease !important;}
+    .edge-line{transform:scaleX(1);}
+    .screen.active .split-half.l,.screen.active .split-half.r{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="footer-mark">THE EDGE</div>
+
+<div class="stage">
+
+  <!-- SCREEN 1 — the wait -->
+  <section class="screen active" id="s1">
+    <div class="wrap">
+      <div class="type-line" id="typer"><span class="caret">▍</span></div>
+      <button class="btn pulse fade-up delay-2" id="enterBtn" style="display:none;">Enter</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2 — the edge -->
+  <section class="screen" id="s2">
+    <div class="wrap">
+      <div class="kicker fade-up">Everyone reaches one</div>
+      <h1 class="display fade-up delay-1">The <span class="lit">edge</span></h1>
+      <div class="edge-line"></div>
+      <p class="lede fade-up delay-2">The line between who you are now and who you are about to become.</p>
+      <p class="display fade-up delay-3" style="font-size:clamp(1.6rem,6vw,2.4rem);">This one is yours.</p>
+      <button class="btn fade-up delay-4" data-next="s3">Look closer</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3 — the glimpse -->
+  <section class="screen" id="s3">
+    <div class="wrap">
+      <div class="kicker">What is on the other side</div>
+      <div class="glimpse" id="glimpse"><span></span></div>
+      <div class="dots" id="dots"></div>
+      <button class="btn" id="glimpseBtn" data-next="s4" style="opacity:0;pointer-events:none;transition:opacity .6s;">Keep going</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 4 — who is crossing -->
+  <section class="screen" id="s4">
+    <div class="wrap">
+      <div class="kicker fade-up">Before you cross</div>
+      <h2 class="display fade-up delay-1" style="font-size:clamp(2rem,8vw,3.6rem);">Where are you<br>standing?</h2>
+      <div class="grid fade-up delay-2" id="grades">
+        <button class="grade" data-grade="8"><span class="g">8</span><span class="word">Discover</span></button>
+        <button class="grade" data-grade="9"><span class="g">9</span><span class="word">Direct</span></button>
+        <button class="grade" data-grade="10"><span class="g">10</span><span class="word">Own</span></button>
+        <button class="grade" data-grade="11"><span class="g">11</span><span class="word">Lead</span></button>
+        <button class="grade" data-grade="12"><span class="g">12</span><span class="word">Ready</span></button>
+      </div>
+      <input class="field fade-up delay-3" id="nameInput" type="text" maxlength="24" placeholder="your name (optional)" autocomplete="off">
+      <button class="btn fade-up delay-3" id="toReveal" data-next="s5" style="opacity:.4;pointer-events:none;">Cross the edge</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 5 — the reveal -->
+  <section class="screen" id="s5">
+    <div class="wrap">
+      <div class="kicker fade-up" id="revealWord">Discover</div>
+      <p class="lede fade-up delay-1" id="revealText" style="max-width:26ch;font-size:clamp(1.2rem,4.4vw,1.6rem);color:#EDECF3;"></p>
+      <div class="edge-line thin fade-up delay-2"></div>
+      <button class="btn fade-up delay-3" data-next="s6">I'm ready</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 6 — cross / unlock -->
+  <section class="screen" id="s6">
+    <div class="wrap">
+      <div class="split-wrap">
+        <div class="split-half l"></div>
+        <div class="split-half r"></div>
+      </div>
+      <h1 class="display fade-up delay-2" id="welcomeLine" style="font-size:clamp(2.4rem,9vw,5rem);">Welcome to<br>the <span class="lit">edge</span></h1>
+      <p class="display fade-up delay-3" style="font-size:clamp(1.6rem,6vw,2.6rem);">All you have to do<br>is wait.</p>
+      <p class="lede fade-up delay-4" style="color:var(--mute);max-width:24ch;">We know. It's hard. But it's worth it.</p>
+      <button class="ghost-link fade-up delay-4" id="restart" style="margin-top:8px;">start again</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="whisper" id="whisper"></div>
+
+<script>
+  // ----- helpers -----
+  function show(id){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    var el = document.getElementById(id);
+    el.classList.add('active');
+    if(id === 's3') runGlimpse();
+  }
+
+  document.querySelectorAll('[data-next]').forEach(function(b){
+    b.addEventListener('click', function(){ show(b.getAttribute('data-next')); });
+  });
+
+  // ----- screen 1: typewriter -----
+  var lines = ["You found it.", "Most people walk straight past."];
+  var typer = document.getElementById('typer');
+  var enterBtn = document.getElementById('enterBtn');
+
+  function typeSequence(){
+    var i = 0, full = "";
+    var parts = lines.slice();
+    function typeLine(text, done){
+      var c = 0;
+      (function step(){
+        typer.innerHTML = (full + text.slice(0,c)) + '<span class="caret">▍</span>';
+        c++;
+        if(c <= text.length){ setTimeout(step, 55); }
+        else { full = full + text + "<br>"; setTimeout(done, 650); }
+      })();
+    }
+    function nextLine(){
+      if(i < parts.length){ var t = parts[i]; i++; typeLine(t, nextLine); }
+      else {
+        typer.innerHTML = full;
+        enterBtn.style.display = 'inline-block';
+      }
+    }
+    nextLine();
+  }
+  // honour reduced motion: skip the typing
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    typer.innerHTML = lines.join('<br>');
+    enterBtn.style.display = 'inline-block';
+  } else {
+    setTimeout(typeSequence, 600);
+  }
+  enterBtn.addEventListener('click', function(){ show('s2'); });
+
+  // ----- screen 3: glimpse fragments -----
+  var fragments = [
+    "Things you haven't learned about yourself yet.",
+    "Skills no one taught you in a classroom.",
+    "How to handle the hard days.",
+    "A version of you that is already on the way.",
+    "The world you are about to walk into."
+  ];
+  var glimpseEl = document.getElementById('glimpse').querySelector('span');
+  var dotsEl = document.getElementById('dots');
+  var glimpseBtn = document.getElementById('glimpseBtn');
+  fragments.forEach(function(){ var d = document.createElement('div'); d.className='dot'; dotsEl.appendChild(d); });
+  var dotEls = dotsEl.querySelectorAll('.dot');
+  var glimpseRan = false;
+
+  function runGlimpse(){
+    if(glimpseRan) return; glimpseRan = true;
+    var i = 0;
+    function step(){
+      glimpseEl.classList.remove('show');
+      setTimeout(function(){
+        glimpseEl.textContent = fragments[i];
+        glimpseEl.classList.add('show');
+        dotEls.forEach(function(d,k){ d.classList.toggle('on', k===i); });
+        i++;
+        if(i < fragments.length){ setTimeout(step, 1950); }
+        else {
+          setTimeout(function(){
+            glimpseBtn.style.opacity = '1';
+            glimpseBtn.style.pointerEvents = 'auto';
+          }, 1400);
+        }
+      }, 450);
+    }
+    step();
+  }
+
+  // ----- screen 4: grade + name -----
+  var chosenGrade = null;
+  var grades = document.querySelectorAll('.grade');
+  var toReveal = document.getElementById('toReveal');
+  grades.forEach(function(g){
+    g.addEventListener('click', function(){
+      grades.forEach(function(x){ x.classList.remove('sel'); });
+      g.classList.add('sel');
+      chosenGrade = g.getAttribute('data-grade');
+      toReveal.style.opacity = '1';
+      toReveal.style.pointerEvents = 'auto';
+    });
+  });
+
+  // ----- screen 5: personalised reveal -----
+  var reveals = {
+    "8":  {word:"Grade 8 · Discover", text:"This is where you start to find out who you really are. The Edge is where the discovering happens."},
+    "9":  {word:"Grade 9 · Direct",   text:"This is where you start choosing a direction. The Edge helps you point it somewhere real."},
+    "10": {word:"Grade 10 · Own",     text:"This is where it all becomes yours. The Edge is where you take the wheel."},
+    "11": {word:"Grade 11 · Lead",    text:"This is where you step up. The Edge is where you learn to lead, starting with yourself."},
+    "12": {word:"Grade 12 · Be Ready",text:"This is where you get ready for everything next. The Edge is where you sharpen for it."}
+  };
+
+  toReveal.addEventListener('click', function(){
+    var r = reveals[chosenGrade] || reveals["8"];
+    document.getElementById('revealWord').textContent = r.word;
+    document.getElementById('revealText').textContent = r.text;
+
+    var name = document.getElementById('nameInput').value.trim();
+    var w = document.getElementById('welcomeLine');
+    if(name){
+      var safe = name.replace(/[<>&"]/g,'');
+      w.innerHTML = 'Welcome to the<br><span class="lit">edge</span>, ' + safe;
+    }
+  });
+
+  // ----- progress whisper -----
+  var labels = {s1:"", s2:"the edge", s3:"the other side", s4:"who is crossing", s5:"your line", s6:"you are in"};
+  var whisper = document.getElementById('whisper');
+  var obs = new MutationObserver(function(){
+    var active = document.querySelector('.screen.active');
+    if(active) whisper.textContent = labels[active.id] || "";
+  });
+  document.querySelectorAll('.screen').forEach(function(s){
+    obs.observe(s, {attributes:true, attributeFilter:['class']});
+  });
+
+  // ----- restart -----
+  document.getElementById('restart').addEventListener('click', function(){
+    chosenGrade = null;
+    grades.forEach(function(x){ x.classList.remove('sel'); });
+    document.getElementById('nameInput').value = '';
+    toReveal.style.opacity = '.4'; toReveal.style.pointerEvents = 'none';
+    show('s1');
+  });
+</script>
+</body>
+</html>
