@@ -243,7 +243,7 @@
     background:rgba(191,23,23,.14);
     box-shadow:0 0 18px rgba(191,23,23,.3);
   }
-  .grade .g{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:.9;}
+  .grade .g{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:.9;color:var(--paper);}
   .grade .word{font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
   .grade.sel .word{color:var(--paper);}
 
@@ -362,13 +362,13 @@
       <div class="kicker fade-up">Before you cross</div>
       <h2 class="display fade-up delay-1" style="font-size:clamp(2rem,8vw,3.6rem);">Where are you<br>standing?</h2>
       <div class="grid fade-up delay-2" id="grades">
-        <button class="grade" data-grade="8"><span class="g">8</span><span class="word">Discover</span></button>
-        <button class="grade" data-grade="9"><span class="g">9</span><span class="word">Direct</span></button>
-        <button class="grade" data-grade="10"><span class="g">10</span><span class="word">Own</span></button>
-        <button class="grade" data-grade="11"><span class="g">11</span><span class="word">Lead</span></button>
-        <button class="grade" data-grade="12"><span class="g">12</span><span class="word">Ready</span></button>
+        <button class="grade" data-grade="8"><span class="g">G8</span><span class="word">Discover</span></button>
+        <button class="grade" data-grade="9"><span class="g">G9</span><span class="word">Direct</span></button>
+        <button class="grade" data-grade="10"><span class="g">G10</span><span class="word">Own</span></button>
+        <button class="grade" data-grade="11"><span class="g">G11</span><span class="word">Lead</span></button>
+        <button class="grade" data-grade="12"><span class="g">G12</span><span class="word">Ready</span></button>
       </div>
-      <input class="field fade-up delay-3" id="nameInput" type="text" maxlength="24" placeholder="your name (optional)" autocomplete="off">
+      <input class="field fade-up delay-3" id="nameInput" type="text" maxlength="24" placeholder="your name" autocomplete="off">
       <button class="btn fade-up delay-3" id="toReveal" data-next="s5" style="opacity:.4;pointer-events:none;">Cross the edge</button>
     </div>
   </section>
@@ -523,7 +523,7 @@
   });
 
   // ----- progress whisper -----
-  var labels = {s1:"", s2:"the edge", s3:"the other side", s4:"who is crossing", s5:"your line", s6:"you are in"};
+  var labels = {s1:"", s2:"the edge", s3:"", s4:"who is crossing", s5:"your line", s6:"you are in"};
   var whisper = document.getElementById('whisper');
   var obs = new MutationObserver(function(){
     var active = document.querySelector('.screen.active');
