@@ -337,7 +337,6 @@
   <!-- SCREEN 2 — the edge -->
   <section class="screen" id="s2">
     <div class="wrap">
-      <div class="kicker fade-up">Everyone reaches one</div>
       <h1 class="display fade-up delay-1">The <span class="lit">edge</span></h1>
       <div class="edge-line"></div>
       <p class="lede fade-up delay-2">The line between who you are now and who you are about to become.</p>
@@ -474,7 +473,7 @@
         glimpseEl.classList.add('show');
         dotEls.forEach(function(d,k){ d.classList.toggle('on', k===i); });
         i++;
-        if(i < fragments.length){ setTimeout(step, 1950); }
+        if(i < fragments.length){ setTimeout(step, 3400); }
         else {
           setTimeout(function(){
             glimpseBtn.style.opacity = '1';
